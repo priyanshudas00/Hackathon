@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Health Assistant - Welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .welcome-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e5799 0%,#207cca 51%,#2989d8 100%);
+            color: white;
+        }
+        .voice-animation {
+            width: 100px;
+            height: 100px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container text-center">
+        <h1>Welcome to Health AI Assistant</h1>
+        <div class="voice-animation">
+            <!-- Add an animated voice wave here -->
+            <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                <path fill="white" d="M20,50 Q30,20 40,50 T60,50 T80,50 T100,50 T120,50 T140,50 T160,50 T180,50" />
+            </svg>
+        </div>
+        <p class="lead">Please enable microphone access and say your name to begin</p>
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" id="username" class="form-control" placeholder="Or type your name here">
+                <button class="btn btn-light" id="startBtn">Start</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value || 'User';
+            fetch('/start_session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${encodeURIComponent(username)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    window.location.href = '/';
+                }
+            });
+        });
+
+        // Voice recognition for initial greeting
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.onresult = function(event) {
+                const name = event.results[0][0].transcript;
+                document.getElementById('username').value = name;
+            };
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
